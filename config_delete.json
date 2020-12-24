@@ -1,5 +1,5 @@
 { 
     "type_val": "kv",
-    "vault_url": "https://vault.keybank.com",
+    "vault_url": "http://localhost:8200",
     "tmp_file": "./tmp.json"
 }

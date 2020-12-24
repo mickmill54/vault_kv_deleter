@@ -184,13 +184,13 @@ function write_key_to_prod {
   echo "${JSON_KEY2}" > ${TMP_FILE} 2>&1
   
   echo -----------------------------------------------------------------------------------------------------
-  echo "Deleting key in ${DST_PATH} with token: $DEST_TOKEN
-  echo "DEBUG ${LINENO}: This is the delete command: PUT_RESULT=$(vault kv put ${DST_PATH} @${TMP_FILE} 2>&1)"
-  PUT_RESULT=$(vault kv put ${DST_PATH} @${TMP_FILE} 2>&1)
-  echo $PUT_RESULT
+  echo "Deleting key in ${DST_PATH} with token:" $DEST_TOKEN
+  echo "DEBUG ${LINENO}: This is the delete command: DEL_RESULT=vault kv delete ${DST_PATH} 2>&1"
+  DEL_RESULT=$(vault kv metadata delete $DST_PATH 2>&1)
+  echo $DEL_RESULT
   
-  # GET_RESULT=$(vault kv get $DST_PATH)
-  # echo "DEBUG ${LINENO}: Current KV = " $GET_RESULT 
+  GET_RESULT=$(vault kv delete $DST_PATH)
+  echo "DEBUG ${LINENO}: Current KV = " $GET_RESULT 
   echo =====================================================================================================
   echo
   
@@ -202,7 +202,7 @@ function list_new_keys {
   echo =====================================================================================================
   echo "List vault keys for input path: ${arg1}"
   echo
-  vault kv list "${arg1}"
+  vault kv list ${arg1}
   echo =====================================================================================================
 }
 
@@ -227,7 +227,7 @@ load_config
 start_job " Hashi Vault migration..."
 
 get_keys_from_dev
-list_new_keys "${VAULT_PATH}"
+list_new_keys ${ROOT_PATH}
 clean_up_tmp_file
 
 end_job " Hashi Vault migration."
