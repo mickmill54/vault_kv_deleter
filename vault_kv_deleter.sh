@@ -224,10 +224,10 @@ test_for_trailing_slash
 load_config
 
 # Iterate on all kv engines or start from the path provided by the user
-start_job " Hashi Vault migration..."
+start_job " Hashi Vault kv deletion..."
 
 get_keys_from_dev
 list_new_keys ${ROOT_PATH}
 clean_up_tmp_file
 
-end_job " Hashi Vault migration."
+end_job " Hashi Vault kv deletion."
