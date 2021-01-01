@@ -6,20 +6,18 @@
 
  
 
-This bash script was built primarily to migrate a ton of secrets from an old, open-source version of Vault to Vault Enterprise. Surprisingly, there was no migration tool available from Hashicorp at the time of this work, so I created one.
+This bash script was built primarily to delete key values from a  given path.  For example if you have a series of key values in the path kv/fu/bar you can delete all the keys under say "bar" or the keys under "fu". All the keys and sub directories will be deleted under the give path.
 
 ## Contents
 
 1. The config.json file
 2. Installation instructions
 3. Running the script
-4. Useful commands and randomish stuff
-5. References
-6. Acknowledgements
+4. Acknowledgements
 
 A couple of notes before diving in: 
 
-* Back up your source secrets engine(s). 
+* Back up your source secrets engine(s) Before you run this command. 
 * Understand what this script is doing before you run it and tweak as needed.
 * You will need to configure the config.json file for your specific use case.
 
@@ -27,22 +25,20 @@ A couple of notes before diving in:
 
 ---
 
-## 1. The config.json file
+## 1. The config_delete.json file
 
-This configuration file is used to reduce the amout of command line arguments and limit the arguments to:
+This configuration file is used to reduce the amount of command line arguments and limit the arguments to:
 
-* The path to find the secrets; and
+* The path to find the secrets and the path; and
 * Not storing the tokens in the configurations or code.
 
-config.json
+config_delete.json
 
 ```
 { 
-    "type_val": "general",
-    "src_url": "https://old_vault.example.com",
-    "dest_url": "https://new_vault.example.com",
+    "type_val": "kv",
+    "vault_url": "https://vault.example.com",
     "tmp_file": "./tmp.json",
-    "config_file":"./config.yaml"
 }
 ```
 
@@ -50,11 +46,9 @@ config.json
 
 | Key           | Value                                                                           |
 | ---           | -----                                                                           |
-| `type_value`  | The type of secrets engine in the source vault instance                         |
-| `src_url`     | The source vault instance URL                                                   |
-| `dest_url`    | the destination vault instance URL                                              |
+| `type_value`  | The type of secrets engine type                        |
+| `vault_url`     | The vault instance URL                                                   |
 | `tmp_file`    | The name of the output temp JSON file; you should not need to change this value |
-| `config_file` | The name of this file                                                           |
 
 ---
 
@@ -68,25 +62,20 @@ The code assumes that both the Hashi Vault client and jq are installed before yo
 If you are using the Homebrew package manager on mac OS, run the following:
 
 ```
+ # For macOS
  $ brew install jq
  $ brew install vault
 ```
 
-This script has not been tested on Windows or Linux, only macOS. I will test Ubuntu at some point and refactor as needed.
+This script has not been tested on Windows or Linux, only macOS 10.x and 11.x. I will test Ubuntu at some point and refactor as needed.
 
 ### Installing the script
 
 ```
 # Clone the repo and then change to the directory.
 $ git clone <this repo url>
-$ cd vault_kv_migration
+$ cd vault_kv_deleter
 
-# Run the script
-$ vault_kv_migration.sh -s "${SRC_TOKEN}" -d "${DEST_TOKEN}" -p "${VAULT_PATH}"
-Usage:
-  Format : ./vault_kv_migrator.sh {source token} {destination token} {path}
-  Example: ./vault_kv_migrator.sh -s xxxxxxx -d xxxxxxx -p /secret/cnn/
-  Note   : A trailing slash in path is required."
 ```
 
 ---
@@ -96,94 +85,18 @@ Usage:
 Command line arguments description
 
 ```
-$ vault_kv_migration.sh -s "${SRC_TOKEN}" -d "${DEST_TOKEN}" -p "${VAULT_PATH}"
-
+$ vault_kv_deleter.sh \ 
+  -s "${VAULT_TOKEN}" \
+  -p "${VAULT_PATH_TO_DELETE}"
 Usage:
-  Format : ./vault_kv_migrator.sh {source token} {destination token} {path}
-  Example: ./vault_kv_migrator.sh -s xxxxxxx -d xxxxxxx -p /secret/cnn/
-  
+  Format : ./vault_kv_migrator.sh {source token} {path}
+  Example: ./vault_kv_migrator.sh -s xxxxxxx -p /kv/cnn/
   Note   : A trailing slash in path is required."
 ```  
 
 ---
 
-## 4. Useful commands and randomish stuff
-
-## Log in to Vault
-
-```
-export VAULT_ADDR=https://vault.example.com
-vault login -method=ldap mount=ad username=mick
-```
-
-View login name**
-```
-TOKEN=$(vault print token) | vault token lookup $TOKEN
-```
-
-### Log out of Vault
-
-I know; strange, but effective.
-
-```
-rm ~/.vault-token
-```
-
-### Check status
-
-```
-vault status
-```
-
-### Create a secretes engine
-
-```
-vault secrets enable -path=kv kv-v2
-vault kv enable-versioning kv
-vault write kv/config max_versions=4
-```
-
-### Create Active Directory groups
-
-```
-vault write auth/ad/groups/admin-group policies=admins,app1,app1
-vault write auth/ad/groups/app-group policies=app1,app2
-vault read auth/ad/groups/admin-group
-vault read auth/ad/groups/app-group
-vault list auth/ad/groups
-```
-
-### Create a policy
-
-```
-vault policy write admins ./admins-policy.hcl
-vault policy list
-vault policy read admins
-```
-
-### Create two secrets
-
-```
-vault kv put kv/anthos/test test=12345
-vault kv put kv/gcp/test test=12345
-
-vault kv list kv/anthos
-vault kv list kv/gco
-vault kv list -format=json kv/gcp
-```
-
----
-
-## 5. References
-
-Below are a couple of good references for learning the Terraform Vault provder information:
-
-* https://learn.hashicorp.com/tutorials/vault/codify-mgmt-enterprise
-* https://registry.terraform.io/providers/hashicorp/vault/latest/docs
-
----
-
-## 6. Acknowledgements
+## 4. Acknowledgements
 
 Many thanks to the following folks:
 
