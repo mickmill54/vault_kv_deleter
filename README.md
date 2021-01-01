@@ -4,7 +4,7 @@
 
 **Date: 2020-12-23**
 
- 
+ ---
 
 This bash script was built primarily to delete key values from a  given path.  For example if you have a series of key values in the path kv/fu/bar you can delete all the keys under say "bar" or the keys under "fu". All the keys and sub directories will be deleted under the give path.
 
@@ -53,7 +53,7 @@ config_delete.json
 ---
 
 ## 2. Installation instructions
-=======
+---
 
 The code assumes that both the Hashi Vault client and jq are installed before you start and tests for the presence of both.
 
