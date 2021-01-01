@@ -53,7 +53,6 @@ config_delete.json
 ---
 
 ## 2. Installation instructions
----
 
 The code assumes that both the Hashi Vault client and jq are installed before you start and tests for the presence of both.
 
